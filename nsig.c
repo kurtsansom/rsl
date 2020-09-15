@@ -290,7 +290,7 @@ int nsig_read_chunk(FILE *fp, char *chunk)
 #endif
       if (i+the_code * sizeof(twob) > NSIG_BLOCK) {
         fprintf(stderr,"nsig_read_chunk: bad data code: number 0's to skip "
-                "(%d) exceeds block size (%d).\n",i+the_code*sizeof(twob),
+                "(%ld) exceeds block size (%d).\n",i+the_code*sizeof(twob),
                 NSIG_BLOCK);
         return -1;
       }

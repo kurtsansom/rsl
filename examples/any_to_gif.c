@@ -33,7 +33,7 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
-int usage(char **argv)
+void usage(char **argv)
 {
   fprintf(stderr, "Usage: %s (v1.20) [-v] [-V] [-x n] [-y n] [-r x] infile [callid_or_firstfile]\n\n", argv[0]);
   fprintf(stderr, "Where: -v  = verbose print.  Default = no printing.\n");
@@ -43,7 +43,8 @@ int usage(char **argv)
   fprintf(stderr, "       -b x = Make black for dbz below x. Default = 0 (no action).\n");
   exit(-1);
 }
-process_args(int argc, char **argv,
+
+void process_args(int argc, char **argv,
 			 char **in_file, char **callid, int *verbose, int *wholevolume,
 			 int *xdim, float *range, int *dbz_black)
 {

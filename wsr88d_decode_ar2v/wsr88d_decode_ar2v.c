@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
     char *block = (char *)malloc(8192), *oblock = (char *)malloc(262144);
     unsigned isize = 8192, osize=262144, olength;
     char stid[5]={0};						/* station id: not used */
+	ssize_t bytes_written;
 		
     /*
      * process command line arguments
@@ -120,10 +121,10 @@ int main(int argc, char *argv[])
 	    if ( stid[0] != 0 ) memcpy(block+20,stid,4);
             if(!tostdout){
 	       lseek(fd, 0, SEEK_SET);
-	       write(fd, block, 24);
+	       bytes_written = write(fd, block, 24);
             }
             else{
-               write(STDOUT_FILENO, block, 24);
+               bytes_written = write(STDOUT_FILENO, block, 24);
             }
 	    continue;
 	}
@@ -183,10 +184,10 @@ int main(int argc, char *argv[])
 		exit(1);
 	    }
             if(tostdout){
-                write(STDOUT_FILENO, oblock, olength);
+                bytes_written = write(STDOUT_FILENO, oblock, olength);
             }
             else{				
-                write(fd, oblock, olength);
+                bytes_written = write(fd, oblock, olength);
             }
 	}
     }

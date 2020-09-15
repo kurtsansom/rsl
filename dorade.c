@@ -77,8 +77,9 @@ Comment_block *dorade_read_comment_block(FILE *in)
 	perror("dorade_read_comment_block");
 	return NULL;
   }
-  fread(cb->code, sizeof(cb->code), 1, in);
-  fread(&cb->len, sizeof(cb->len), 1, in);
+  size_t bytes_read;
+  bytes_read = fread(cb->code, sizeof(cb->code), 1, in);
+  bytes_read = fread(&cb->len, sizeof(cb->len), 1, in);
 
   /* Check for big endian data on little endian platform.  The smallest value
    * cb->len could have is 8 (length of cb->code + cb->len), so we put that in
@@ -96,7 +97,7 @@ Comment_block *dorade_read_comment_block(FILE *in)
 	perror("dorade_read_comment_block: cb->comment");
 	return cb;
   }
-  fread(cb->comment, sizeof(char), cb->len-8, in);
+  bytes_read = fread(cb->comment, sizeof(char), cb->len-8, in);
   return cb;
 }
 
@@ -108,6 +109,7 @@ Comment_block *dorade_read_comment_block(FILE *in)
 Volume_desc    *dorade_read_volume_desc    (FILE *in)
 {
   Volume_desc *vd;
+  size_t bytes_read;
 
   vd = (Volume_desc *) calloc(1, sizeof(Volume_desc));
   if(!vd) {
@@ -115,7 +117,7 @@ Volume_desc    *dorade_read_volume_desc    (FILE *in)
 	return NULL;
   }
 
-  fread(vd, sizeof(Volume_desc), 1, in);
+  bytes_read = fread(vd, sizeof(Volume_desc), 1, in);
   /* Now, convert from Big Endian. */
   if (do_swap) {
       vd->len = ntohl(vd->len);
@@ -151,6 +153,7 @@ Radar_desc     *dorade_read_radar_desc     (FILE *in)
 {
   Radar_desc *rd;
   int i;
+  size_t bytes_read;
 
   rd = (Radar_desc *) calloc(1, sizeof(Radar_desc));
   if(!rd) {
@@ -158,7 +161,7 @@ Radar_desc     *dorade_read_radar_desc     (FILE *in)
 	return NULL;
   }
 
-  fread(rd, sizeof(Radar_desc), 1, in);
+  bytes_read = fread(rd, sizeof(Radar_desc), 1, in);
   /* Now, convert from Big Endian. */
   if (do_swap) {
 	swap_4_bytes(&rd->len);
@@ -210,6 +213,7 @@ Radar_desc     *dorade_read_radar_desc     (FILE *in)
 Parameter_desc *dorade_read_parameter_desc (FILE *in)
 {
   Parameter_desc *pd;
+  size_t bytes_read;
 
   pd = (Parameter_desc *) calloc(1, sizeof(Parameter_desc));
   if(!pd) {
@@ -217,7 +221,7 @@ Parameter_desc *dorade_read_parameter_desc (FILE *in)
 	return NULL;
   }
 
-  fread(pd, sizeof(Parameter_desc), 1, in);
+  bytes_read = fread(pd, sizeof(Parameter_desc), 1, in);
   /* Now, convert from Big Endian. */
   if (do_swap) {
 	swap_4_bytes(&pd->len);
@@ -252,6 +256,7 @@ Cell_range_vector      *dorade_read_cell_range_vector     (FILE *in)
   Cell_range_vector *cv;
   char *buff;
   int i;
+  size_t bytes_read;
 
   cv = (Cell_range_vector *) calloc(1, sizeof(Cell_range_vector));
   if(!cv) {
@@ -259,9 +264,9 @@ Cell_range_vector      *dorade_read_cell_range_vector     (FILE *in)
 	return NULL;
   }
 
-  fread(&cv->code, sizeof(cv->code), 1, in);
-  fread(&cv->len, sizeof(cv->len), 1, in);
-  fread(&cv->ncells, sizeof(cv->ncells), 1, in);
+  bytes_read = fread(&cv->code, sizeof(cv->code), 1, in);
+  bytes_read = fread(&cv->len, sizeof(cv->len), 1, in);
+  bytes_read = fread(&cv->ncells, sizeof(cv->ncells), 1, in);
   if (do_swap) {
 	swap_4_bytes(&cv->len);
 	swap_4_bytes(&cv->ncells);
@@ -271,7 +276,7 @@ Cell_range_vector      *dorade_read_cell_range_vector     (FILE *in)
 	perror("dorade_read_cell_range_vector: cv->range_cell");
 	return cv;
   }
-  fread(cv->range_cell, sizeof(float), cv->ncells, in);
+  bytes_read = fread(cv->range_cell, sizeof(float), cv->ncells, in);
 
   if (do_swap) {
 	for (i=0; i<cv->ncells; i++)
@@ -289,7 +294,7 @@ Cell_range_vector      *dorade_read_cell_range_vector     (FILE *in)
 	- cv->ncells*4;
   buff = (char *)malloc(i);
   if (!buff) return cv;
-  fread(buff, sizeof(char), i, in);
+  bytes_read = fread(buff, sizeof(char), i, in);
   free(buff);
   return cv;
 }
@@ -304,6 +309,7 @@ Correction_factor_desc *dorade_read_correction_factor_desc(FILE *in)
   Correction_factor_desc *cf;
   char *remaining;
   int is_cfac = 0;
+  size_t bytes_read;
 
   cf = (Correction_factor_desc *) calloc(1, sizeof(Correction_factor_desc));
   if(!cf) {
@@ -313,11 +319,11 @@ Correction_factor_desc *dorade_read_correction_factor_desc(FILE *in)
 
   /* Make sure we have Correction Factor Descriptor. */
   while (!is_cfac) {
-      fread(cf->code, sizeof(cf->code), 1, in);
+      bytes_read = fread(cf->code, sizeof(cf->code), 1, in);
       if (strncmp(cf->code, "CFAC", 4) == 0)
 	  is_cfac = 1;
       else {
-	  fread(&cf->len, sizeof(cf->len), 1, in);
+	  bytes_read = fread(&cf->len, sizeof(cf->len), 1, in);
 	  if (do_swap) swap_4_bytes(&cf->len);
 	  remaining = (char *) malloc(cf->len-8);
 	  if (!remaining) {
@@ -325,11 +331,11 @@ Correction_factor_desc *dorade_read_correction_factor_desc(FILE *in)
 	      fprintf(stderr,"cf->len = %d\n\n", cf->len);
 	      return NULL;
 	  }
-	  fread(remaining, sizeof(char), cf->len-8, in);
+	  bytes_read = fread(remaining, sizeof(char), cf->len-8, in);
 	  free(remaining);
       }
   }
-  fread(&cf->len, sizeof(Correction_factor_desc)-4, 1, in);
+  bytes_read = fread(&cf->len, sizeof(Correction_factor_desc)-4, 1, in);
   /* Now, convert from Big Endian. */
   if (do_swap) {
 	swap_4_bytes(&cf->len);
@@ -397,6 +403,7 @@ Sensor_desc            *dorade_read_sensor (FILE *in)
 Sweep_info *dorade_read_sweep_info(FILE *in)
 {
   Sweep_info *si;
+  size_t bytes_read;
 
   si = (Sweep_info *) calloc(1, sizeof(Sweep_info));
   if(!si) {
@@ -404,7 +411,7 @@ Sweep_info *dorade_read_sweep_info(FILE *in)
 	return NULL;
   }
 
-  fread(si, sizeof(Sweep_info), 1, in);
+  bytes_read = fread(si, sizeof(Sweep_info), 1, in);
   /* FIXME: ?? For now, VOLD is what we expect when there
    *           are no more SWIB.  This is a data driven EOF.
    *           Returning NULL should suffice.
@@ -439,6 +446,7 @@ Sweep_info *dorade_read_sweep_info(FILE *in)
 Ray_info       *dorade_read_ray_info      (FILE *in)
 {
   Ray_info *ri;
+  size_t bytes_read;
 
   ri = (Ray_info *) calloc(1, sizeof(Ray_info));
   if(!ri) {
@@ -446,7 +454,7 @@ Ray_info       *dorade_read_ray_info      (FILE *in)
 	return NULL;
   }
 
-  fread(ri, sizeof(Ray_info), 1, in);
+  bytes_read = fread(ri, sizeof(Ray_info), 1, in);
   /* Now, convert from Big Endian. */
   if (do_swap) {
 	swap_4_bytes(&ri->len);
@@ -475,6 +483,7 @@ Platform_info  *dorade_read_platform_info (FILE *in)
 {
   Platform_info *pi;
   int len_first_two;
+  size_t bytes_read;
 
   pi = (Platform_info *) calloc(1, sizeof(Platform_info));
   if(!pi) {
@@ -489,13 +498,13 @@ Platform_info  *dorade_read_platform_info (FILE *in)
    * the place of ASIB when radar is grounded.
    */
 
-  fread(pi->code, sizeof(pi->code), 1, in);
-  fread(&pi->len, sizeof(pi->len), 1, in);
+  bytes_read = fread(pi->code, sizeof(pi->code), 1, in);
+  bytes_read = fread(&pi->len, sizeof(pi->len), 1, in);
   if (do_swap) swap_4_bytes(&pi->len);
   len_first_two = sizeof(pi->code) + sizeof(pi->len);
     
   if (strncmp(pi->code, "ASIB", 4) == 0) {
-      fread(&pi->longitude, sizeof(Platform_info)-len_first_two, 1, in);
+      bytes_read = fread(&pi->longitude, sizeof(Platform_info)-len_first_two, 1, in);
       /* Read past any extra bytes. */
       if (pi->len > sizeof(Platform_info)) {
 	  if (read_extra_bytes(pi->len - sizeof(Platform_info), in) <= 0)
@@ -544,6 +553,7 @@ Parameter_data *dorade_read_parameter_data(FILE *in)
 {
   Parameter_data *pd;
   int len;
+  size_t bytes_read;
 
   pd = (Parameter_data *) calloc(1, sizeof(Parameter_data));
   if(!pd) {
@@ -551,9 +561,9 @@ Parameter_data *dorade_read_parameter_data(FILE *in)
 	return NULL;
   }
 
-  fread(&pd->code, sizeof(pd->code), 1, in);
-  fread(&pd->len, sizeof(pd->len), 1, in);
-  fread(&pd->name, sizeof(pd->name), 1, in);
+  bytes_read = fread(&pd->code, sizeof(pd->code), 1, in);
+  bytes_read = fread(&pd->len, sizeof(pd->len), 1, in);
+  bytes_read = fread(&pd->name, sizeof(pd->name), 1, in);
   if (do_swap) swap_4_bytes(&pd->len);
   /* Length is in parameter data block? or calculate if from pd->len. */
 
@@ -566,7 +576,7 @@ Parameter_data *dorade_read_parameter_data(FILE *in)
 	perror("dorade_read_parameter_data: pd->data");
 	return pd;
   }
-  fread(pd->data, sizeof(char), len, in);
+  bytes_read = fread(pd->data, sizeof(char), len, in);
   
   /* FIXME: Big endian conversion in caller?  Is that the right place? */
 

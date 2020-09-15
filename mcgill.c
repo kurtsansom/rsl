@@ -117,6 +117,8 @@ mcgFile_t *mcgFileOpen(int *code, char *filename)
    mcgFile_t *file;
    char buffer[MCG_RECORD];
    char *csp_buffer;
+   int little_endian(void);
+   void swap_2_bytes(void *word);
    
    /* Allocate space for the mcgFile structure. */
    if ((file = (mcgFile_t *)malloc(sizeof(mcgFile_t))) == NULL)

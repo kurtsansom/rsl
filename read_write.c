@@ -55,9 +55,10 @@ Ray *RSL_read_ray(FILE *fp)
   Ray_header ray_h;
   Ray *r;
   int nbins;
+  size_t bytes_read;
 
-  (void)fread(header_buf, sizeof(char), sizeof(header_buf), fp);
-  (void)fread(&nbins, sizeof(int), 1, fp);
+  bytes_read = fread(header_buf, sizeof(char), sizeof(header_buf), fp);
+  bytes_read = fread(&nbins, sizeof(int), 1, fp);
   if (nbins == 0) return NULL;
 
   memcpy(&ray_h, header_buf, sizeof(Ray_header));
@@ -65,7 +66,7 @@ Ray *RSL_read_ray(FILE *fp)
   r = RSL_new_ray(ray_h.nbins);
   r->h = ray_h;
 
-  (void)fread(r->range, sizeof(Range), r->h.nbins, fp);
+  bytes_read = fread(r->range, sizeof(Range), r->h.nbins, fp);
   return r;
 }
 Sweep *RSL_read_sweep(FILE *fp)
@@ -75,10 +76,11 @@ Sweep *RSL_read_sweep(FILE *fp)
   int i;
   Sweep *s;
   int nrays;
+  size_t bytes_read;
 
-  (void)fread(header_buf, sizeof(char), sizeof(header_buf), fp);
+  bytes_read = fread(header_buf, sizeof(char), sizeof(header_buf), fp);
 
-  (void)fread(&nrays, sizeof(int), 1, fp);
+  bytes_read = fread(&nrays, sizeof(int), 1, fp);
   if (nrays == 0) return NULL;
 
   if (radar_verbose_flag)
@@ -100,11 +102,10 @@ Volume *RSL_read_volume(FILE *fp)
   int i;
   Volume *v;
   int nsweeps;
+  size_t bytes_read;
 
-
-
-  (void)fread(header_buf, sizeof(char), sizeof(header_buf), fp);
-  (void)fread(&nsweeps, sizeof(int), 1, fp);
+  bytes_read = fread(header_buf, sizeof(char), sizeof(header_buf), fp);
+  bytes_read = fread(&nsweeps, sizeof(int), 1, fp);
   if (nsweeps == 0)	return NULL;
 
   if (radar_verbose_flag)
@@ -184,21 +185,22 @@ Radar *RSL_read_radar(char *infile)
   int i;
   int nradar;
   char title[100];
+  size_t bytes_read;
 
   if ((fp = fopen(infile, "r")) == NULL) {
-	perror(infile);
-	return NULL;
+	  perror(infile);
+	  return NULL;
   }
   fp = uncompress_pipe(fp);
-  (void)fread(title, sizeof(char), sizeof(title), fp);
+  bytes_read = fread(title, sizeof(char), sizeof(title), fp);
   if (strncmp(title, "RSL", 3) != 0) return NULL;
 
-  (void)fread(header_buf, sizeof(char), sizeof(header_buf), fp);
+  bytes_read = fread(header_buf, sizeof(char), sizeof(header_buf), fp);
   memcpy(&radar_h, header_buf, sizeof(Radar_header));
   radar = RSL_new_radar(MAX_RADAR_VOLUMES);
   radar->h = radar_h;
 
-  (void)fread(&nradar, sizeof(int), 1, fp);
+  bytes_read = fread(&nradar, sizeof(int), 1, fp);
   if (radar_verbose_flag)
 	fprintf(stderr,"Reading %d volumes.\n", nradar);
 
@@ -314,7 +316,7 @@ int RSL_write_radar_fp(Radar *radar, FILE *fp)
   if (radar == NULL) return 0;
   
   memset(title, 0, sizeof(title));
-  (void)sprintf(title, "RSL v%s. sizeof(Range) %d", RSL_VERSION_STR, sizeof(Range));
+  (void)sprintf(title, "RSL v%s. sizeof(Range) %ld", RSL_VERSION_STR, sizeof(Range));
   n += fwrite(title, sizeof(char), sizeof(title), fp);
   
   memset(header_buf, 0, sizeof(header_buf));

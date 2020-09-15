@@ -47,7 +47,7 @@ void make_pathname(char *filename, char *dir, char *pathname)
 /***********************************************************************/
 /*** DBW ***************************************************************/
 /***********************************************************************/
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
 
     Radar       *radar;
     Volume      *dz_volume, *vr_volume;
@@ -82,7 +82,7 @@ main(int argc, char **argv) {
     char        filename[100], outfile[100], nexfile[100];
     char        command[100], file_prefix[100], file_suffix[3];
     char        dir_string[100], red[120], grn[120], blu[120];
-    char        time_string[14], site_string[10],img_base[20];
+    char        time_string[20], site_string[10],img_base[20];
     char        pathname[256], gifdir[100], pgmdir[100], ufdir[100];
     char        *inpath;
     FILE        *fp;
@@ -252,9 +252,10 @@ main(int argc, char **argv) {
    and time string (YYMMDD_hhmm).  The file suffix is 
    like MIME type (e.g, .gif, .pgm, .uf, etc.)
 */
-    sprintf(time_string,"%4d/%2.2d%2.2d %2.2d:%2.2d UTC", 
-            radar->h.year, radar->h.month, radar->h.day, 
-            radar->h.hour, radar->h.minute);
+    sprintf(time_string,"%4hu/%2.2hhu%2.2hhu %2.2hhu:%2.2hhu UTC", 
+            (unsigned short)radar->h.year, (unsigned char)radar->h.month,
+            (unsigned char)radar->h.day, (unsigned char)radar->h.hour,
+            (unsigned char)radar->h.minute);
 /*
   Determine the location (lat/lon) of the radar.
  */
@@ -265,8 +266,9 @@ main(int argc, char **argv) {
            in_file, radar->h.radar_name, time_string, longitude, latitude);
 
     sprintf(time_string,"%4d_%2.2d%2.2d_%2.2d%2.2d", 
-            radar->h.year, radar->h.month, radar->h.day, 
-            radar->h.hour, radar->h.minute);
+            (unsigned short)radar->h.year, (unsigned char)radar->h.month,
+            (unsigned char)radar->h.day, (unsigned char)radar->h.hour,
+            (unsigned char)radar->h.minute);
 
     if (radar->h.vcp > 0) printf("VCP %d\n", radar->h.vcp);
 /* 
@@ -518,14 +520,14 @@ main(int argc, char **argv) {
           continue;
         }
         if(make_pgm) {
-          sprintf(file_suffix,"pgm");
+          const char file_suffix[3] = "pgm";
           sprintf(filename,"qc_%s_%2.2d.%s", time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
           make_pathname(filename, pgmdir, pathname);
           RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
         }
         if(make_gif) {
-          sprintf(file_suffix,"gif");
+          const char file_suffix[3] = "gif";
           sprintf(filename,"qc_%s_%2.2d.%s", time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
           make_pathname(filename, gifdir, pathname);
@@ -545,7 +547,7 @@ main(int argc, char **argv) {
           continue;
         }
         if(make_pgm) {
-          sprintf(file_suffix,"pgm");
+          const char file_suffix[3] = "pgm";
           sprintf(filename,"dz_%s_%2.2d.%s", 
               time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
@@ -553,7 +555,7 @@ main(int argc, char **argv) {
           RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
         }
         if(make_gif) {
-          sprintf(file_suffix,"gif");
+          const char file_suffix[3] = "gif";
           sprintf(filename,"dz_%s_%2.2d.%s", time_string,i,file_suffix); 
 /*        
           sprintf(filename,"dz_%s.%s.%s", time_string,in_file,file_suffix); 
@@ -576,7 +578,7 @@ main(int argc, char **argv) {
           continue;
         }
         if(make_pgm) {
-          sprintf(file_suffix,"pgm");
+          const char file_suffix[3] = "pgm";
           sprintf(filename,"zt_%s_%2.2d.%s", 
                   time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
@@ -584,7 +586,7 @@ main(int argc, char **argv) {
           RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
         }
         if(make_gif) {
-          sprintf(file_suffix,"gif");
+          const char file_suffix[3] = "gif";
           sprintf(filename,"zt_%s_%2.2d.%s", 
                   time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
@@ -610,7 +612,7 @@ main(int argc, char **argv) {
             continue;
           }
           if(make_pgm) {
-            sprintf(file_suffix,"pgm");
+            const char file_suffix[3] = "pgm";
             sprintf(filename,"dr_%s_%2.2d.%s", 
                     time_string,i,file_suffix);
             printf("Creating: %s\n", filename);
@@ -618,7 +620,7 @@ main(int argc, char **argv) {
             RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
           }
           if(make_gif) {
-            sprintf(file_suffix,"gif");
+            const char file_suffix[3] = "gif";
             sprintf(filename,"dr_%s_%2.2d.%s", 
                     time_string,i,file_suffix);
             printf("Creating: %s\n", filename);
@@ -640,14 +642,14 @@ main(int argc, char **argv) {
           continue;
         }
         if(make_pgm) {
-          sprintf(file_suffix,"pgm");
+          const char file_suffix[3] = "pgm";
           sprintf(filename,"vr_%s_%2.2d.%s", time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
           make_pathname(filename, pgmdir, pathname);
           RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
         }
         if(make_gif) {
-          sprintf(file_suffix,"gif");
+          const char file_suffix[3] = "gif";
           sprintf(filename,"vr_%s_%2.2d.%s", time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
           make_pathname(filename, gifdir, pathname);
@@ -667,7 +669,7 @@ main(int argc, char **argv) {
           continue;
         }
         if(make_pgm) {
-          sprintf(file_suffix,"pgm");
+          const char file_suffix[3] = "pgm";
           sprintf(filename,"sw_%s_%2.2d.%s", 
                   time_string,i,file_suffix);
           printf("Creating: %s\n", filename);
@@ -675,7 +677,7 @@ main(int argc, char **argv) {
           RSL_sweep_to_pgm(sweep, pathname, xdim, ydim, maxr);
         }
         if(make_gif) {
-          sprintf(file_suffix,"gif");
+          const char file_suffix[3] = "gif";
           sprintf(filename,"sw_%s_%2.2d.%s", 
                   time_string,i,file_suffix);
           printf("Creating: %s\n", filename);

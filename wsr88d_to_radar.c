@@ -260,6 +260,8 @@ Radar *RSL_wsr88d_to_radar(char *infile, char *call_or_first_tape_file)
   extern int *rsl_qsweep; /* See RSL_read_these_sweeps in volume.c */
   extern int rsl_qsweep_max;
 
+  void wsr88d_remove_sails_sweep(Radar *radar);
+
   sitep = NULL;
 /* Determine the site quasi automatically.  Here is the procedure:
  *    1. Determine if we have a call sign.

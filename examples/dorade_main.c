@@ -13,10 +13,12 @@ int main(int argc, char **argv)
 
   RSL_radar_verbose_on();
   radar = RSL_dorade_to_radar(argv[1]);
-  if (radar == NULL) 
-	printf("radar == NULL\n");
+  if (radar == NULL) {
+    printf("radar == NULL\n");
+  }
   else
-	printf("radar == %x\n", (unsigned int)radar);
-
+	{
+    printf("radar == %lx\n", (unsigned long)radar);
+  }
   exit(0);
 }

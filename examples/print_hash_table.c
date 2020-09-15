@@ -48,6 +48,7 @@ void print_hash_table (Sweep *s)
   Azimuth_hash *index;
   float azim;
   float res;
+  int SWEEP_INDEX(Sweep *s);
 
   if (s == NULL) return;
   sweep_index = SWEEP_INDEX(s);

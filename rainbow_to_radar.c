@@ -73,6 +73,7 @@ Radar *RSL_rainbow_to_radar(char *infile)
     int nvolumes;
     Rainbow_hdr rainbow_hdr;
     struct dms latdms, londms;
+    void read_rainbow_header(Rainbow_hdr *rainbow_header, FILE *fp);
 
     /* These next lines allow program to read from a regular file, a
      * compressed file, or standard input.  I lifted them from RSL_uf_to_radar
@@ -227,7 +228,7 @@ int rainbow_data_to_radar(Radar *radar, Rainbow_hdr rainbow_hdr, FILE *fp)
 	fprintf(stderr,"WARNING: number of rays computed is not the number "
 		"expected.\n");
 	fprintf(stderr,"Computed = nrays: azstart = %d, az_stop = %d, "
-		"az_step = %f\n");
+		"az_step = %f\n", rainbow_hdr.az_start, rainbow_hdr.az_stop, rainbow_hdr.az_step);
 	fprintf(stderr,"Expected 360\n");
     }
     radar->v[vol_index] = RSL_new_volume(nsweeps);
